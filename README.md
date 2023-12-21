@@ -1,2 +1,31 @@
 # BRADx-API
-API for the BRADx project
+
+## Overview
+API for the BRADx project. This API includes access to all submodules (Upper Gantry, Prep Deck, Reader, and TECs). It provides access to obtaining status information for modules,
+Firmware versioning, etc. This REST API is utilized by both the CDP 2.0 GUI as well as the Independent Reader Frontend.
+
+## Technology Used
+- python
+- fastapi
+- uvicorn
+
+## Getting Started
+### Prerequists
+- python3.8
+### Installation
+1. Clone the repo
+2. Open the solution in Visual Studio and build the project
+
+## Usage
+
+## Features
+
+## License
+
+## Contact
+- Authors: In2Being, G. Lopez-Candales, Aru R.
+- Email: gabriel_lopez-candales@bio-rad.com
+
+## Acknowledgments
+- [FastAPI](https://github.com/tiangolo/fastapi)
+- [uvicorn](https://github.com/encode/uvicorn)
