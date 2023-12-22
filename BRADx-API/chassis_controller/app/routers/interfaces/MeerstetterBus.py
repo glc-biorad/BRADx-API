@@ -52,7 +52,7 @@ class MeerstetterBusRouterInterface:
         # Write the message, not buffered and non-blocking (see __init__)
         self._connection.write(message)
         # Get response (non-blocking)
-        resp = await self._connection.read_async(256)
+        resp = await self._connection.read_async(256) # <-- SLOW (Takes 1 second)
         return resp
 
     def exchange(self, message: bytearray) -> Union[IOError, bytes]:
@@ -96,11 +96,10 @@ async def meerstetter_bus_timed_exchange(pkt: MeerstetterBusPacket) -> tuple:
     and the elapsed time (in microseconds) to complete the exchange"""
     begin = time.time_ns()
 
-    conn = MeerstetterBusRouterInterface.find_and_connect()
-    resp = await conn.exchange_async(pkt.raw_packet)
+    conn = MeerstetterBusRouterInterface.find_and_connect() # <-- 0.2 seconds
+    resp = await conn.exchange_async(pkt.raw_packet) # <-- SLOW (1 second)
     pkt.parse(resp) # Fill in the response in the packet
     end = time.time_ns()
     elapsed = (end - begin) // 1000
-
     return (pkt, elapsed)
 

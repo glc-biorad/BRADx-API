@@ -63,33 +63,78 @@ Definitions of command and error codes as stated in the "Mecom" protocol standar
 https://www.meerstetter.ch/category/35-latest-communication-protocols
 """
 
+TEC_DEVICE_STATUSES = {
+    0: "Init",
+    1: "Ready",
+    2: "Run",
+    3: "Error",
+    4: "Bootloader",
+    5: "Device will Reset within next 200ms"
+    }
+
 
 TEC_PARAMETERS = [
+    # Device Identification
+    {"id": 103, "name": "Firmware Version", "format": "INT32"},
     {"id": 104, "name": "Device Status", "format": "INT32"},
     {"id": 105, "name": "Error Number", "format": "INT32"},
-    {"id": 108, "name": "Save Data to Flash", "format": "INT32"},
+    {"id": 108, "name": "Save Data to Flash", "format": "INT32"}, # 0: Enabled, 1: Disabled
     {"id": 109, "name": "Flash Status", "format": "INT32"},
 
+    # Chx Temperature Measurement (Read only)
     {"id": 1000, "name": "Object Temperature", "format": "FLOAT32"},
     {"id": 1001, "name": "Sink Temperature", "format": "FLOAT32"},
     {"id": 1010, "name": "Target Object Temperature", "format": "FLOAT32"},
     {"id": 1011, "name": "Ramp Object Temperature", "format": "FLOAT32"},
     {"id": 1020, "name": "Actual Output Current", "format": "FLOAT32"},
     {"id": 1021, "name": "Actual Output Voltage", "format": "FLOAT32"},
+
+    # Chx Fan Controller
+    {"id": 1100, "name": "Relative Cooling Power", "format": "FLOAT32"},  
+    {"id": 1101, "name": "Nominal Fan Speed", "format": "FLOAT32"},  
+    {"id": 1102, "name": "Actual Fan Speed", "format": "FLOAT32"},  
+    {"id": 1103, "name": "Fan PWM Level", "format": "FLOAT32"},  
+
+    # Object Temperature Stability Detection
     {"id": 1200, "name": "Temperature is Stable", "format": "INT32"},
 
+    # CHx Output Stage Enabled
     {"id": 2010, "name": "Status", "format": "INT32"},
     {"id": 2030, "name": "Current Limitation", "format": "FLOAT32"},
     {"id": 2031, "name": "Voltage Limitation", "format": "FLOAT32"},
     {"id": 2032, "name": "Current Error Threshold", "format": "FLOAT32"},
     {"id": 2033, "name": "Voltage Error Threshold", "format": "FLOAT32"},
+
+    # Device Address
     {"id": 2051, "name": "Device Address", "format": "INT32"},
 
+    # CHx Nominal Temperature
     {"id": 3000, "name": "Target Object Temp (Set)", "format": "FLOAT32"},
+
+    # CHx Temperature Controller PID Values
+    {"id": 3010, "name": "Kp", "format": "FLOAT32"},
+    {"id": 3011, "name": "Ti", "format": "FLOAT32"},
+    {"id": 3012, "name": "Td", "format": "FLOAT32"},
+
+    # CHx Actual Object Temperature Error Limits
+    {"id": 4011, "name": "Object Upper Error Threshold", "format": "FLOAT32"},
+    {"id": 4010, "name": "Object Lower Error Threshold", "format": "FLOAT32"},
+    
+    # CHx Actual Sink Temperature Error Limits
+    {"id": 5011, "name": "Sink Upper Error Threshold", "format": "FLOAT32"},
+    {"id": 5010, "name": "Sink Lower Error Threshold", "format": "FLOAT32"},
+    
     {"id": 6100, "name": "GPIO Function", "format": "INT32"},
     {"id": 6101, "name": "GPIO Level Assignment", "format": "INT32"},
     {"id": 6102, "name": "GPIO Hardware Configuration", "format": "INT32"},
     {"id": 6103, "name": "GPIO Channel", "format": "INT32"},
+
+    # CHx Fan Temperature Controller
+    {"id": 6211, "name": "Fan Target Temperature", "format": "FLOAT32"},
+
+    # CHx Fan Speed Control
+    {"id": 6220, "name": "0% Speed", "format": "FLOAT32"},
+    {"id": 6221, "name": "100% Speed", "format": "FLOAT32"},
 
     {"id": 6300, "name": "Source Selection", "format": "INT32"},
     {"id": 6302, "name": "Observe Mode", "format": "INT32"},
@@ -644,7 +689,7 @@ class MeerstetterBusPacket:
     raw_packet: bytearray
     query: Query
     packet_type: MeerstetterBusPacketType
-    value : int
+    value : float
     parameter : str 
     sequence : int 
     address : int 
@@ -657,7 +702,7 @@ class MeerstetterBusPacket:
         address : int, 
         sequence : int = 1, 
         parameter : str = "",
-        value : int = 0,
+        value : float = 0,
     ):
         self.sequence = sequence 
         self.address = address 

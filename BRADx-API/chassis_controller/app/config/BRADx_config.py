@@ -130,6 +130,7 @@ PREP_BUS_ADDR = {
 }
 
 #  Meerstetter RS232 Bus Addresses
+# TODO: Look into setting this to agree with the CDP 2.0 convention (A: 1, B: 2, C: 3, D: 4)
 MEERSTETTER_BUS_ADDR = {
     READER_OEM_HEATER_FRONT_1 : 0x04,
     READER_OEM_HEATER_FRONT_2 : 0x03,
