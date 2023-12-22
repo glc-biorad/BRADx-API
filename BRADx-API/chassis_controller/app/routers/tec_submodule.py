@@ -73,7 +73,7 @@ async def get_object_temperature(heater: MeerstetterIDs):
         "_mid": id,
         "_duration_us": elapsed,
         "message": pkt.raw_packet,
-        "response": pkt.data,
+        "response": str(pkt.data),
     }
 
 @router.post("/object-temperature/")
@@ -120,7 +120,7 @@ async def set_object_temperature(
         "_mid": id,
         "_duration_us": elapsed,
         "message": pkt.raw_packet,
-        "response": pkt.data,
+        "response": str(pkt.data),
     }
 
 @router.get("/sink-temperature/", response_model=dict, tags=["TEC"])
@@ -163,7 +163,7 @@ async def get_sink_temperature(heater: MeerstetterIDs):
         "_mid": id,
         "_duration_us": elapsed,
         "message": pkt.raw_packet,
-        "response": pkt.data,
+        "response": str(pkt.data),
     }
 
 @router.get("/target-object-temperature/", response_model=dict, tags=["TEC"])
@@ -206,7 +206,7 @@ async def get_target_object_temperature(heater: MeerstetterIDs):
         "_mid": id,
         "_duration_us": elapsed,
         "message": pkt.raw_packet,
-        "response": pkt.data,
+        "response": str(pkt.data),
     }
 
 @router.get("/actual-output-current/", response_model=dict, tags=["TEC"])
@@ -249,7 +249,7 @@ async def get_actual_output_current(heater: MeerstetterIDs):
         "_mid": id,
         "_duration_us": elapsed,
         "message": pkt.raw_packet,
-        "response": pkt.data,
+        "response": str(pkt.data),
     }
 
 @router.get("/actual-output-voltage/", response_model=dict, tags=["TEC"])
@@ -292,7 +292,7 @@ async def get_actual_output_voltage(heater: MeerstetterIDs):
         "_mid": id,
         "_duration_us": elapsed,
         "message": pkt.raw_packet,
-        "response": pkt.data,
+        "response": str(pkt.data),
     }
 
 @router.get("/relative-cooling-power/", response_model=dict, tags=["TEC"])
@@ -335,7 +335,7 @@ async def get_relative_cooling_power(heater: MeerstetterIDs):
         "_mid": id,
         "_duration_us": elapsed,
         "message": pkt.raw_packet,
-        "response": pkt.data,
+        "response": str(pkt.data),
     }
 
 @router.get("/actual-fan-speed/", response_model=dict, tags=["TEC"])
@@ -378,7 +378,7 @@ async def get_actual_fan_Speed(heater: MeerstetterIDs):
         "_mid": id,
         "_duration_us": elapsed,
         "message": pkt.raw_packet,
-        "response": pkt.data,
+        "response": str(pkt.data),
     }
 
 @router.get("/current-error-threshold/", response_model=dict, tags=["TEC"])
@@ -421,7 +421,7 @@ async def get_current_error_threshold(heater: MeerstetterIDs):
         "_mid": id,
         "_duration_us": elapsed,
         "message": pkt.raw_packet,
-        "response": pkt.data,
+        "response": str(pkt.data),
     }
 
 @router.post("/current-error-threshold/")
@@ -468,7 +468,7 @@ async def set_current_error_threshold(
         "_mid": id,
         "_duration_us": elapsed,
         "message": pkt.raw_packet,
-        "response": pkt.data,
+        "response": str(pkt.data),
     }
 
 @router.get("/voltage-error-threshold/", response_model=dict, tags=["TEC"])
@@ -511,7 +511,7 @@ async def get_voltage_error_threshold(heater: MeerstetterIDs):
         "_mid": id,
         "_duration_us": elapsed,
         "message": pkt.raw_packet,
-        "response": pkt.data,
+        "response": str(pkt.data),
     }
 
 @router.post("/voltage-error-threshold/")
@@ -558,7 +558,7 @@ async def set_voltage_error_threshold(
         "_mid": id,
         "_duration_us": elapsed,
         "message": pkt.raw_packet,
-        "response": pkt.data,
+        "response": str(pkt.data),
     }
 
 @router.get("/firmware-version/", response_model=dict, tags=["TEC"])
@@ -687,7 +687,7 @@ async def get_device_address(heater: MeerstetterIDs):
         "_mid": id,
         "_duration_us": elapsed,
         "message": pkt.raw_packet,
-        "response": TEC_DEVICE_STATUSES[pkt.data],
+        "response": str(pkt.data),
     }
 
 @router.post("/meerstetter/reset/{id}")
@@ -720,7 +720,7 @@ async def reset(
         "_mid": id,
         "_duration_us": elapsed,
         "message": pkt.raw_packet,
-        "response": pkt.data,
+        "response": str(pkt.data),
     }
 
 
