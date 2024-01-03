@@ -1,7 +1,12 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\BRADx-API",
+    "\\BRADx-API\\chassis_controller",
+    "\\BRADx-API\\chassis_controller\\app",
+    "\\BRADx-API\\chassis_controller\\app\\routers",
+    "\\BRADx-API\\chassis_controller\\app\\routers\\interfaces"
   ],
-  "SelectedNode": "\\C:\\Users\\u112958\\Source\\Repos\\BRADx-API",
+  "SelectedNode": "\\BRADx-API\\chassis_controller\\app\\routers\\interfaces\\MeerstetterBus.py",
   "PreviewInSolutionExplorer": false
 }

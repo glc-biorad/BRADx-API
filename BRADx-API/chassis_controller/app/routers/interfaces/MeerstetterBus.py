@@ -8,14 +8,14 @@ import serial.tools.list_ports
 import platform
 
 from chassis_controller.app.routers.interfaces.utils_meerstetter import MeerstetterBusPacket
+from chassis_controller.app.config.BRADx_config import MEERSTETTER_VID, MEERSTETTER_PID, MEERSTETTER_SER
 
 current_os = platform.system()
-
 
 class MeerstetterBusRouterInterface:
     """Meerstetter bus router interface class to communicate with modules in the Meerstetter system"""
 
-    def __init__(self, port: str, baud: int = 57600, timeout: float = 0.03) -> None:
+    def __init__(self, port: str, baud: int = 57600, timeout: float = 0.1) -> None: # Note: was using a timeout of 0.1 seconds
         self.port = port
         self.baud = baud
         self.timeout = timeout
@@ -77,14 +77,23 @@ class MeerstetterBusRouterInterface:
         if current_os == "Windows": # Send an ask for the device ID
             meerstetter_ports = list(serial.tools.list_ports.comports())
             for port in meerstetter_ports:
+                # Get the hardware id information for the port
+                hwid = port.hwid
+                _ = hwid.split()
+                # Check if this port is the Meerstetter using the VID, PID, and SER for confirmation
                 try:
-
-                    conn = cls(port.device)
-                    conn.connect()
-                    return conn
-
-                except:
-                    raise IndexError("Connection Failed")
+                    vid = _[1].split(":")[1].replace("PID=","")
+                    pid = _[1].split(":")[-1]
+                    ser = _[-1].replace("SER=","")
+                    if (vid == MEERSTETTER_VID and pid == MEERSTETTER_PID and ser == MEERSTETTER_SER):
+                        try:
+                            conn = cls(port.device)
+                            conn.connect()
+                            return conn
+                        except:
+                            raise IndexError("Connection Failed")
+                except: 
+                    continue
             
             raise ValueError("No Meerstetter controller device found")
 
@@ -97,7 +106,9 @@ async def meerstetter_bus_timed_exchange(pkt: MeerstetterBusPacket) -> tuple:
     begin = time.time_ns()
 
     conn = MeerstetterBusRouterInterface.find_and_connect()
+    print(f"HERE {pkt.raw_packet}")
     resp = await conn.exchange_async(pkt.raw_packet)
+    print(f"HERE {resp}")
     pkt.parse(resp) # Fill in the response in the packet
     end = time.time_ns()
     elapsed = (end - begin) // 1000
