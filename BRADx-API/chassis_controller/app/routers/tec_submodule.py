@@ -66,14 +66,16 @@ async def get_object_temperature(heater: MeerstetterIDs):
     # Send the request and get the response
     try:
         pkt, elapsed = await meerstetter_bus_timed_exchange(pkt)
+        response = str(pkt.data)
     except ValueError as e:
         raise HTTPException(status_code=500, detail=str(e))
+        response = "None"
     return {
         "_sid": READER_SUBSYSTEM_ID,
         "_mid": id,
         "_duration_us": elapsed,
         "message": pkt.raw_packet,
-        "response": str(pkt.data),
+        "response": response,
     }
 
 @router.post("/object-temperature/")
