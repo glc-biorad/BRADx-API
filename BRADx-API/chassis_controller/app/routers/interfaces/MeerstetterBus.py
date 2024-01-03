@@ -15,7 +15,7 @@ current_os = platform.system()
 class MeerstetterBusRouterInterface:
     """Meerstetter bus router interface class to communicate with modules in the Meerstetter system"""
 
-    def __init__(self, port: str, baud: int = 57600, timeout: float = 0.1) -> None: # Note: was using a timeout of 0.1 seconds
+    def __init__(self, port: str, baud: int = 57600, timeout: float = 0.08) -> None: # Note: was using a timeout of 0.1 seconds
         self.port = port
         self.baud = baud
         self.timeout = timeout
@@ -106,9 +106,7 @@ async def meerstetter_bus_timed_exchange(pkt: MeerstetterBusPacket) -> tuple:
     begin = time.time_ns()
 
     conn = MeerstetterBusRouterInterface.find_and_connect()
-    print(f"HERE {pkt.raw_packet}")
     resp = await conn.exchange_async(pkt.raw_packet)
-    print(f"HERE {resp}")
     pkt.parse(resp) # Fill in the response in the packet
     end = time.time_ns()
     elapsed = (end - begin) // 1000
