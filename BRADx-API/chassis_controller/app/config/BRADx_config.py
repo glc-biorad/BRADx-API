@@ -10,6 +10,12 @@ FASTAPI_VERSION     = "1.1.0"
 #CHASSIS_COM_PORT    = "COM13" # Unit A
 #CHASSIS_COM_PORT    = "COM7" # Unit D
 
+# Meerstetter vid (Vender ID), pid (Product ID) and ser (Serial Number) for the board
+MEERSTETTER_VID = "0403"
+MEERSTETTER_PID = "6001"
+MEERSTETTER_SER = "AQ034U3RA"
+
+
 # Subsystem ID when accessed through the chassis/bus module
 CHASSIS_SUBSYSTEM_ID = 0x00
 
