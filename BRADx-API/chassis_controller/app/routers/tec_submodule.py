@@ -1,5 +1,7 @@
 
 # Version: Test
+from re import S
+from urllib import response
 from fastapi import APIRouter, HTTPException, Query
 from chassis_controller.app.routers.interfaces.utils import convert_distance_str_to_steps
 from chassis_controller.app.config.BRADx_config import *
@@ -561,6 +563,325 @@ async def set_voltage_error_threshold(
         "_duration_us": elapsed,
         "message": pkt.raw_packet,
         "response": str(pkt.data),
+    }
+
+@router.get("/object-upper-error-threshold/", response_model=dict, tags=["TEC"])
+async def get_object_upper_error_threshold(heater: MeerstetterIDs):
+    """
+    Returns the object upper error threshold for the selected heater
+    \n
+    Parameters:\n
+        - heater (MeerstetterIDs): name of the heater to be checked\n
+    Returns:\n
+        - _sid (int): submodule id\n
+        - _mid (int): module id\n
+        - _duration_us (int): elapsed time in microseconds\n
+        - message (str): raw packet\n
+        - response (float): deserialized data (Current Error Threshold [A])
+    """
+    # Convert string to address
+    meerstetter_ids_dict = MeerstetterIDs.get_ids(MeerstetterIDs)
+    meerstetter_address_dict = MeerstetterIDs.get_addresses(MeerstetterIDs)
+    id = meerstetter_ids_dict[heater]
+    address = meerstetter_address_dict[id]
+    if id not in list(meerstetter_ids_dict.values()):
+        raise HTTPException(
+            status_code=500, detail=f"Meerstetter at ID {id} not available"
+        )
+    # Build the request/response packet
+    pkt = MeerstetterBusPacket(
+        MeerstetterBusPacketType.GET_PARAMETER, 
+        address=MEERSTETTER_BUS_ADDR[id],
+        sequence= rand_request_id(),
+        parameter="Object Upper Error Threshold"
+    )
+    # Send the request and get the response
+    try:
+        pkt, elapsed = await meerstetter_bus_timed_exchange(pkt)
+    except ValueError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    return {
+        "_sid": READER_SUBSYSTEM_ID,
+        "_mid": id,
+        "_duration_us": elapsed,
+        "message": pkt.raw_packet,
+        "response": str(pkt.data),
+    }
+
+@router.get("/object-lower-error-threshold/", response_model=dict, tags=["TEC"])
+async def get_object_lower_error_threshold(heater: MeerstetterIDs):
+    """
+    Returns the object lower error threshold for the selected heater
+    \n
+    Parameters:\n
+        - heater (MeerstetterIDs): name of the heater to be checked\n
+    Returns:\n
+        - _sid (int): submodule id\n
+        - _mid (int): module id\n
+        - _duration_us (int): elapsed time in microseconds\n
+        - message (str): raw packet\n
+        - response (float): deserialized data (Current Error Threshold [A])
+    """
+    # Convert string to address
+    meerstetter_ids_dict = MeerstetterIDs.get_ids(MeerstetterIDs)
+    meerstetter_address_dict = MeerstetterIDs.get_addresses(MeerstetterIDs)
+    id = meerstetter_ids_dict[heater]
+    address = meerstetter_address_dict[id]
+    if id not in list(meerstetter_ids_dict.values()):
+        raise HTTPException(
+            status_code=500, detail=f"Meerstetter at ID {id} not available"
+        )
+    # Build the request/response packet
+    pkt = MeerstetterBusPacket(
+        MeerstetterBusPacketType.GET_PARAMETER, 
+        address=MEERSTETTER_BUS_ADDR[id],
+        sequence= rand_request_id(),
+        parameter="Object Lower Error Threshold"
+    )
+    # Send the request and get the response
+    try:
+        pkt, elapsed = await meerstetter_bus_timed_exchange(pkt)
+    except ValueError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    return {
+        "_sid": READER_SUBSYSTEM_ID,
+        "_mid": id,
+        "_duration_us": elapsed,
+        "message": pkt.raw_packet,
+        "response": str(pkt.data),
+    }
+
+@router.get("/sink-upper-error-threshold/", response_model=dict, tags=["TEC"])
+async def get_sink_upper_error_threshold(heater: MeerstetterIDs):
+    """
+    Returns the sink upper error threshold for the selected heater
+    \n
+    Parameters:\n
+        - heater (MeerstetterIDs): name of the heater to be checked\n
+    Returns:\n
+        - _sid (int): submodule id\n
+        - _mid (int): module id\n
+        - _duration_us (int): elapsed time in microseconds\n
+        - message (str): raw packet\n
+        - response (float): deserialized data (Current Error Threshold [A])
+    """
+    # Convert string to address
+    meerstetter_ids_dict = MeerstetterIDs.get_ids(MeerstetterIDs)
+    meerstetter_address_dict = MeerstetterIDs.get_addresses(MeerstetterIDs)
+    id = meerstetter_ids_dict[heater]
+    address = meerstetter_address_dict[id]
+    if id not in list(meerstetter_ids_dict.values()):
+        raise HTTPException(
+            status_code=500, detail=f"Meerstetter at ID {id} not available"
+        )
+    # Build the request/response packet
+    pkt = MeerstetterBusPacket(
+        MeerstetterBusPacketType.GET_PARAMETER, 
+        address=MEERSTETTER_BUS_ADDR[id],
+        sequence= rand_request_id(),
+        parameter="Sink Upper Error Threshold"
+    )
+    # Send the request and get the response
+    try:
+        pkt, elapsed = await meerstetter_bus_timed_exchange(pkt)
+    except ValueError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    return {
+        "_sid": READER_SUBSYSTEM_ID,
+        "_mid": id,
+        "_duration_us": elapsed,
+        "message": pkt.raw_packet,
+        "response": str(pkt.data),
+    }
+
+@router.get("/sink-lower-error-threshold/", response_model=dict, tags=["TEC"])
+async def get_sink_lower_error_threshold(heater: MeerstetterIDs):
+    """
+    Returns the sink lower error threshold for the selected heater
+    \n
+    Parameters:\n
+        - heater (MeerstetterIDs): name of the heater to be checked\n
+    Returns:\n
+        - _sid (int): submodule id\n
+        - _mid (int): module id\n
+        - _duration_us (int): elapsed time in microseconds\n
+        - message (str): raw packet\n
+        - response (float): deserialized data (Current Error Threshold [A])
+    """
+    # Convert string to address
+    meerstetter_ids_dict = MeerstetterIDs.get_ids(MeerstetterIDs)
+    meerstetter_address_dict = MeerstetterIDs.get_addresses(MeerstetterIDs)
+    id = meerstetter_ids_dict[heater]
+    address = meerstetter_address_dict[id]
+    if id not in list(meerstetter_ids_dict.values()):
+        raise HTTPException(
+            status_code=500, detail=f"Meerstetter at ID {id} not available"
+        )
+    # Build the request/response packet
+    pkt = MeerstetterBusPacket(
+        MeerstetterBusPacketType.GET_PARAMETER, 
+        address=MEERSTETTER_BUS_ADDR[id],
+        sequence= rand_request_id(),
+        parameter="Sink Lower Error Threshold"
+    )
+    # Send the request and get the response
+    try:
+        pkt, elapsed = await meerstetter_bus_timed_exchange(pkt)
+    except ValueError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    return {
+        "_sid": READER_SUBSYSTEM_ID,
+        "_mid": id,
+        "_duration_us": elapsed,
+        "message": pkt.raw_packet,
+        "response": str(pkt.data),
+    }
+
+@router.get("/temperature-is-stable/", response_model=dict, tags=["TEC"])
+async def get_temperature_is_stable(heater: MeerstetterIDs):
+    """
+    Returns the temperature is stable result for the selected heater
+    \n
+    Parameters:\n
+        - heater (MeerstetterIDs): name of the heater to be checked\n
+    Returns:\n
+        - _sid (int): submodule id\n
+        - _mid (int): module id\n
+        - _duration_us (int): elapsed time in microseconds\n
+        - message (str): raw packet\n
+        - response (float): deserialized data (Current Error Threshold [A])
+    """
+    # Convert string to address
+    meerstetter_ids_dict = MeerstetterIDs.get_ids(MeerstetterIDs)
+    meerstetter_address_dict = MeerstetterIDs.get_addresses(MeerstetterIDs)
+    id = meerstetter_ids_dict[heater]
+    address = meerstetter_address_dict[id]
+    if id not in list(meerstetter_ids_dict.values()):
+        raise HTTPException(
+            status_code=500, detail=f"Meerstetter at ID {id} not available"
+        )
+    # Build the request/response packet
+    pkt = MeerstetterBusPacket(
+        MeerstetterBusPacketType.GET_PARAMETER, 
+        address=MEERSTETTER_BUS_ADDR[id],
+        sequence= rand_request_id(),
+        parameter="Temperature is Stable"
+    )
+    # Send the request and get the response
+    try:
+        pkt, elapsed = await meerstetter_bus_timed_exchange(pkt)
+    except ValueError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    if (pkt.data == 0):
+        response = "Temperature regulation is not active"
+    elif (pkt.data == 1):
+        response = "Is not stable"
+    elif (pkt.data):
+        response = "Is stable"
+    return {
+        "_sid": READER_SUBSYSTEM_ID,
+        "_mid": id,
+        "_duration_us": elapsed,
+        "message": pkt.raw_packet,
+        "response": response,
+    }
+
+@router.get("/temperature-control/", response_model=dict, tags=["TEC"])
+async def get_chx_output_stage_enabled(heater: MeerstetterIDs):
+    """
+    Returns the status of the CHx Output Stage Enabled for the selected heater
+    \n
+    Parameters:\n
+        - heater (MeerstetterIDs): name of the heater to be checked\n
+    Returns:\n
+        - _sid (int): submodule id\n
+        - _mid (int): module id\n
+        - _duration_us (int): elapsed time in microseconds\n
+        - message (str): raw packet\n
+        - response (float): deserialized data (Current Error Threshold [A])
+    """
+    # Convert string to address
+    meerstetter_ids_dict = MeerstetterIDs.get_ids(MeerstetterIDs)
+    meerstetter_address_dict = MeerstetterIDs.get_addresses(MeerstetterIDs)
+    id = meerstetter_ids_dict[heater]
+    address = meerstetter_address_dict[id]
+    if id not in list(meerstetter_ids_dict.values()):
+        raise HTTPException(
+            status_code=500, detail=f"Meerstetter at ID {id} not available"
+        )
+    # Build the request/response packet
+    pkt = MeerstetterBusPacket(
+        MeerstetterBusPacketType.GET_PARAMETER, 
+        address=MEERSTETTER_BUS_ADDR[id],
+        sequence= rand_request_id(),
+        parameter="Status"
+    )
+    # Send the request and get the response
+    try:
+        pkt, elapsed = await meerstetter_bus_timed_exchange(pkt)
+        response = "Off" if pkt.data == ChxOutputStageEnableIntOption.Off else "On"
+    except ValueError as e:
+        response = options.get_option(-1)
+        raise HTTPException(status_code=500, detail=str(e))
+    return {
+        "_sid": READER_SUBSYSTEM_ID,
+        "_mid": id,
+        "_duration_us": elapsed,
+        "message": pkt.raw_packet,
+        "response": response,
+    }
+
+
+
+@router.post("/temperature-control/")
+async def set_chx_output_stage_enabled(
+    heater: MeerstetterIDs,
+    status: ChxOutputStageEnableStrOption):
+    """
+    Set the CHx Output Stage Enable for the selected heater\n
+    \n
+    Parameters:\n
+        - heater (MeerstetterIDs): heater to be used\n
+        - setpoint (float): target object temperature for the heater\n
+    Returns:
+        - _sid (int): submodule id\n
+        - _mid (int): module id\n
+        - _duration_us (int): elapsed time in microseconds\n
+        - message (str): raw packet\n
+        - response (float): deserialized data
+    """
+    # Convert string to address
+    meerstetter_ids_dict = MeerstetterIDs.get_ids(MeerstetterIDs)
+    meerstetter_address_dict = MeerstetterIDs.get_addresses(MeerstetterIDs)
+    id = meerstetter_ids_dict[heater]
+    address = meerstetter_address_dict[id]
+    if id not in list(meerstetter_ids_dict.values()):
+        raise HTTPException(
+            status_code=500, detail=f"Meerstetter at ID {id} not available"
+        )
+    # Get the int option from the str option for CHx Output Stage Enable
+    status = 1 if (status == ChxOutputStageEnableStrOption.On) else 0
+    # Build the request/response packet
+    pkt = MeerstetterBusPacket(
+        MeerstetterBusPacketType.SET_PARAMETER, 
+        address=MEERSTETTER_BUS_ADDR[id],
+        sequence= rand_request_id(),
+        parameter="Status",
+        value=status
+    )
+    # Send the request and get the response
+    try:
+        pkt, elapsed = await meerstetter_bus_timed_exchange(pkt)
+        response = str(pkt.data)
+    except ValueError as e:
+        response = -1
+        raise HTTPException(status_code=500, detail=str(e))
+    return {
+        "_sid": READER_SUBSYSTEM_ID,
+        "_mid": id,
+        "_duration_us": elapsed,
+        "message": pkt.raw_packet,
+        "response": response,
     }
 
 @router.get("/firmware-version/", response_model=dict, tags=["TEC"])

@@ -100,7 +100,8 @@ PIPETTOR_BUS_ADDR = {
 
 }
 
-from enum import Enum 
+from enum import Enum
+from tkinter import OFF 
 class PipettorGantryAxisOptions(str, Enum):
     x = 'X'
     y = 'Y'
@@ -162,6 +163,14 @@ class MeerstetterIDs(str, Enum):
     def get_addresses(self):
         addresses = MEERSTETTER_BUS_ADDR
         return addresses
+    
+class ChxOutputStageEnableIntOption(int, Enum):
+    Off = 0
+    On = 1
+    
+class ChxOutputStageEnableStrOption(str, Enum):
+    Off = "Off"
+    On = "On"
 
 
 #  Step to um conversion values for the Pipettor motors
