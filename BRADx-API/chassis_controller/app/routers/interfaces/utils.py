@@ -79,7 +79,6 @@ class BRADxBusPacket:
     @classmethod
     def parse(cls, data: bytes):
         """Parse a set of bytes (usually a response packet) and convert to this class type"""
-        print(data)
         try:
             sof = chr(data[0])
             if sof != BUS_PACKET_START:
