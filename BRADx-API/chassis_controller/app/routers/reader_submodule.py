@@ -228,67 +228,67 @@ async def jog_axis(
     }
 
 
-@router.post("/led/{id}")
-async def led_channel_on(
-    id: int,
-    channel: int = Query(description="LED Channel ID"),
-    intensity: int = Query(description="LED Intensity, max 1000")
-    ):
-    """Turn on the LED Channel"""
-    if id not in [
-        READER_LED
-    ]:
-        raise HTTPException(
-            status_code=500, detail=f"LED at ID {id} not available"
-        )
+# @router.post("/led/{id}")
+# async def led_channel_on(
+#     id: int,
+#     channel: int = Query(description="LED Channel ID"),
+#     intensity: int = Query(description="LED Intensity, max 1000")
+#     ):
+#     """Turn on the LED Channel"""
+#     if id not in [
+#         READER_LED
+#     ]:
+#         raise HTTPException(
+#             status_code=500, detail=f"LED at ID {id} not available"
+#         )
 
-    # Build the request message and packet
-    message = BRADXRequest(READER_BUS_ADDR[READER_LED], rand_request_id(), "set", [str(channel), str(intensity)])
-    req = BRADxBusPacket(
-        READER_SUBSYSTEM_ID, id, message.raw, 20, BRADxBusPacketType.REQUEST
-    )
-    # Send the request and get the response
-    try:
-        pkt, elapsed = await bradx_bus_timed_exchange(req)
-    except ValueError as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    return {
-        "_sid": READER_SUBSYSTEM_ID,
-        "_mid": id,
-        "_duration_us": elapsed,
-        "message": message.raw.strip(),
-        "response": pkt.data,
-    }
+#     # Build the request message and packet
+#     message = BRADXRequest(READER_BUS_ADDR[READER_LED], rand_request_id(), "set", [str(channel), str(intensity)])
+#     req = BRADxBusPacket(
+#         READER_SUBSYSTEM_ID, id, message.raw, 20, BRADxBusPacketType.REQUEST
+#     )
+#     # Send the request and get the response
+#     try:
+#         pkt, elapsed = await bradx_bus_timed_exchange(req)
+#     except ValueError as e:
+#         raise HTTPException(status_code=500, detail=str(e))
+#     return {
+#         "_sid": READER_SUBSYSTEM_ID,
+#         "_mid": id,
+#         "_duration_us": elapsed,
+#         "message": message.raw.strip(),
+#         "response": pkt.data,
+#     }
 
-@router.post("/led/{id}/off")
-async def led_channel_off(
-    id: int,
-    channel: int = Query(description="LED Channel ID")
-    ):
-    """Turn off the LED Channel"""
-    if id not in [
-        READER_LED
-    ]:
-        raise HTTPException(
-            status_code=500, detail=f"LED at ID {id} not available"
-        )
+# @router.post("/led/{id}/off")
+# async def led_channel_off(
+#     id: int,
+#     channel: int = Query(description="LED Channel ID")
+#     ):
+#     """Turn off the LED Channel"""
+#     if id not in [
+#         READER_LED
+#     ]:
+#         raise HTTPException(
+#             status_code=500, detail=f"LED at ID {id} not available"
+#         )
 
-    # Build the request message and packet
-    message = BRADXRequest(READER_BUS_ADDR[READER_LED], rand_request_id(), "off", [str(channel)])
-    req = BRADxBusPacket(
-        READER_SUBSYSTEM_ID, id, message.raw, 20, BRADxBusPacketType.REQUEST
-    )
-    # Send the request and get the response
-    try:
-        pkt, elapsed = await bradx_bus_timed_exchange(req)
-    except ValueError as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    return {
-        "_sid": READER_SUBSYSTEM_ID,
-        "_mid": id,
-        "_duration_us": elapsed,
-        "message": message.raw.strip(),
-        "response": pkt.data,
-    }
+#     # Build the request message and packet
+#     message = BRADXRequest(READER_BUS_ADDR[READER_LED], rand_request_id(), "off", [str(channel)])
+#     req = BRADxBusPacket(
+#         READER_SUBSYSTEM_ID, id, message.raw, 20, BRADxBusPacketType.REQUEST
+#     )
+#     # Send the request and get the response
+#     try:
+#         pkt, elapsed = await bradx_bus_timed_exchange(req)
+#     except ValueError as e:
+#         raise HTTPException(status_code=500, detail=str(e))
+#     return {
+#         "_sid": READER_SUBSYSTEM_ID,
+#         "_mid": id,
+#         "_duration_us": elapsed,
+#         "message": message.raw.strip(),
+#         "response": pkt.data,
+#     }
 
 
