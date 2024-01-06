@@ -1,26 +1,23 @@
 
-# Version: Test
+# Version: 2.0.0
 # for now change version number manually
 # xx.yy.zz
 # xx - Major update / feature addition
 # yy - Minor update / enhancement to existing commands
 # zz - Bug fix
-FASTAPI_VERSION     = "1.1.0"
-
-#CHASSIS_COM_PORT    = "COM13" # Unit A
-#CHASSIS_COM_PORT    = "COM7" # Unit D
+FASTAPI_VERSION     = "2.0.0"
 
 # Meerstetter vid (Vender ID), pid (Product ID) and ser (Serial Number) for the board
 MEERSTETTER_VID = "0403"
 MEERSTETTER_PID = "6001"
 MEERSTETTER_SER = "AQ034U3RA"
 
-
 # Subsystem ID when accessed through the chassis/bus module
 CHASSIS_SUBSYSTEM_ID = 0x00
 
 # Subsystem ID when accessed through the chassis/bus module
 PREP_DECK_SUBSYSTEM_ID = 0x02
+
 # Subsystem ID when accessed through the chassis/bus module
 READER_SUBSYSTEM_ID = 0x03
 
@@ -100,6 +97,9 @@ PIPETTOR_BUS_ADDR = {
 
 }
 
+# LED Max Intensity
+LED_MAX_INTENSITY = 1000
+
 from enum import Enum
 from tkinter import OFF 
 class PipettorGantryAxisOptions(str, Enum):
@@ -163,6 +163,14 @@ class MeerstetterIDs(str, Enum):
     def get_addresses(self):
         addresses = MEERSTETTER_BUS_ADDR
         return addresses
+    
+class LEDChannelIDs(int, Enum):
+    one = 1
+    two = 2
+    three = 3
+    four = 4
+    five = 5
+    six = 6
     
 class ChxOutputStageEnableIntOption(int, Enum):
     Off = 0
