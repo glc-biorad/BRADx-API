@@ -77,19 +77,19 @@ class BRADxBusRouterInterface:
         bradx_ports = list(serial.tools.list_ports.comports())
         for port in bradx_ports:
             if port.pid == 22336:
-                print('Found BRADx Chassis controller on '+str(port.name)+'\n')
+                #rint('Found BRADx Chassis controller on '+str(port.name)+'\n')
                 conn = cls(port.device)
                 conn.connect()
                 return conn
         raise ValueError("No BRADx chassis controller device found")
 
 async def bradx_bus_timed_exchange(req: BRADxBusPacket) -> tuple:
-    print(str(req.raw_packet))
+    #print(str(req.raw_packet))
     """Return a tuple containing the response packet object
     and the elapsed time (in microseconds) to complete the exchange"""
     begin = time.time_ns()
     conn = BRADxBusRouterInterface.find_and_connect()
-    print(conn._connection)
+    #print(conn._connection)
 
     try:
         resp = await conn.exchange_async(req.raw_packet)
