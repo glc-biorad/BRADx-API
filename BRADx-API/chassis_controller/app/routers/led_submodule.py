@@ -49,7 +49,7 @@ async def get_version():
         "response": "v"+version[8]+"."+version[9]+"."+version[10]
     }
 
-@router.post("/on", response_model=dict, tags=["LED"])
+@router.post("/on/", response_model=dict, tags=["LED"])
 async def led_channel_on(channel: LEDChannelIDs = Query(description="LED Channel ID"),
     intensity: int = Query(description="LED Intensity (%)")
     ):
@@ -88,7 +88,7 @@ async def led_channel_on(channel: LEDChannelIDs = Query(description="LED Channel
         "response": str(response),
     }
 
-@router.post("/off", response_model=dict, tags=["LED"])
+@router.post("/off/", response_model=dict, tags=["LED"])
 async def led_channel_off(channel: LEDChannelIDs = Query(description="LED Channel ID")):
     """Turn off the LED Channel
     \n
