@@ -24,7 +24,7 @@ router = APIRouter(
 # Subsystem ID when accessed through the chassis/bus module
 READER_SUBSYSTEM_ID = 0x03
 
-@router.get("/version", response_model=dict, tags=["LED"])
+@router.get("/version/", response_model=dict, tags=["LED"])
 async def get_version():
     """
     Returns the version info loaded onto the LED board
@@ -47,6 +47,32 @@ async def get_version():
         "_duration_us": elapsed,
         "message": message.raw.strip(),
         "response": "v"+version[8]+"."+version[9]+"."+version[10]
+    }
+
+@router.get("/status/", response_model=dict, tags=["LED"])
+async def get_status(channel: LEDChannelIDs = Query(description="LED Channel ID")):
+    """
+    Returns the status of the LED
+    """
+    id = READER_LED
+    # Build the request message and packet
+    message = BRADXRequest(READER_BUS_ADDR[id], rand_request_id(), "?led", [])
+    req = BRADxBusPacket(
+        READER_SUBSYSTEM_ID, id, message.raw, 25, BRADxBusPacketType.REQUEST
+    )
+    response = ""
+    # Send the request and get the response
+    try:
+        pkt, elapsed = await bradx_bus_timed_exchange(req)
+        response = pkt.data
+    except ValueError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    return {
+        "_sid": READER_SUBSYSTEM_ID,
+        "_mid": id,
+        "_duration_us": elapsed,
+        "message": message.raw.strip(),
+        "response": response
     }
 
 @router.post("/on/", response_model=dict, tags=["LED"])

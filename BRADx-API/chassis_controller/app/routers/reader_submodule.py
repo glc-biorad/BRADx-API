@@ -186,7 +186,7 @@ async def home_axis(id: int):
 @router.post("/axis/jog/{id}")
 async def jog_axis(
     id: int,
-    distance: str = Query(description="Axis jog distance and direction (units required (mm/um), sign and decimal point optional"),
+    distance: int = Query(description="Axis jog distance in microsteps (negative values are toward home)"),
     velocity: int = Query(description="Velocity to use when moving"),
 ):
     """Set the position of the axis"""
@@ -207,7 +207,9 @@ async def jog_axis(
         )
 
     # Convert the string to a step amount
-    steps = convert_distance_str_to_steps(distance, READER_STEP_RATIO[id])
+    #steps = convert_distance_str_to_steps(distance, READER_STEP_RATIO[id])
+    # Reverse the direction
+    steps = distance
 
     # Build the request message and packet
     message = BRADXRequest(READER_BUS_ADDR[id], rand_request_id(), "mrel", [str(steps), str(velocity)])
