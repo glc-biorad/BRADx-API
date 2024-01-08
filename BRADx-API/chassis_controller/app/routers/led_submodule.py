@@ -24,7 +24,7 @@ router = APIRouter(
 # Subsystem ID when accessed through the chassis/bus module
 READER_SUBSYSTEM_ID = 0x03
 
-@router.get("/version/", response_model=dict, tags=["LED"])
+@router.get("/version", response_model=dict, tags=["LED"])
 async def get_version():
     """
     Returns the version info loaded onto the LED board
