@@ -129,8 +129,12 @@ TEC_PARAMETERS = [
     {"id": 6102, "name": "GPIO Hardware Configuration", "format": "INT32"},
     {"id": 6103, "name": "GPIO Channel", "format": "INT32"},
 
+    # Advanced Fan
+    {"id": 6200, "name": "Fan Control Enable", "format": "INT32"},
+
     # CHx Fan Temperature Controller
-    {"id": 6211, "name": "Fan Target Temperature", "format": "FLOAT32"},
+    {"id": 6211, "name": "Target Temperature", "format": "FLOAT32"},
+    #{"id": 6211, "name": "Fan Target Temperature", "format": "FLOAT32"},
 
     # CHx Fan Speed Control
     {"id": 6220, "name": "0% Speed", "format": "FLOAT32"},
