@@ -179,7 +179,14 @@ class ChxOutputStageEnableIntOption(int, Enum):
 class ChxOutputStageEnableStrOption(str, Enum):
     Off = "Off"
     On = "On"
-
+    
+class FanControlEnableStateStrOption(str, Enum):
+    Disabled = "Disabled",
+    Enabled = "Enabled"
+    
+class FanControlEnableStateIntOption(int, Enum):
+    Disabled = 0,
+    Enabled = 1
 
 #  Step to um conversion values for the Pipettor motors
 PIPETTOR_STEP_RATIO = { PIPETTOR_X_MOTOR    : 100,

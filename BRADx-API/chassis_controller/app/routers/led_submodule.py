@@ -56,7 +56,7 @@ async def get_status(channel: LEDChannelIDs = Query(description="LED Channel ID"
     """
     id = READER_LED
     # Build the request message and packet
-    message = BRADXRequest(READER_BUS_ADDR[id], rand_request_id(), "?led", [])
+    message = BRADXRequest(READER_BUS_ADDR[id], rand_request_id(), "?led", [str(channel.value)])
     req = BRADxBusPacket(
         READER_SUBSYSTEM_ID, id, message.raw, 25, BRADxBusPacketType.REQUEST
     )
@@ -64,7 +64,7 @@ async def get_status(channel: LEDChannelIDs = Query(description="LED Channel ID"
     # Send the request and get the response
     try:
         pkt, elapsed = await bradx_bus_timed_exchange(req)
-        response = pkt.data
+        response = int(str(pkt.data).strip("\r").split(",")[-1])/10
     except ValueError as e:
         raise HTTPException(status_code=500, detail=str(e))
     return {
@@ -72,7 +72,7 @@ async def get_status(channel: LEDChannelIDs = Query(description="LED Channel ID"
         "_mid": id,
         "_duration_us": elapsed,
         "message": message.raw.strip(),
-        "response": response
+        "response": str(response)
     }
 
 @router.post("/on/", response_model=dict, tags=["LED"])
@@ -111,7 +111,7 @@ async def led_channel_on(channel: LEDChannelIDs = Query(description="LED Channel
         "_mid": id,
         "_duration_us": elapsed,
         "message": message.raw.strip(),
-        "response": str(response),
+        "response": pkt.data, # response
     }
 
 @router.post("/off/", response_model=dict, tags=["LED"])

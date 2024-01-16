@@ -385,6 +385,96 @@ async def get_actual_fan_Speed(heater: MeerstetterIDs):
         "response": str(pkt.data),
     }
 
+@router.get("/target-fan-temperature/", response_model=dict, tags=["TEC"])
+async def get_fan_target_temperature(heater: MeerstetterIDs):
+    """
+    Returns the target temperature for the selected heater's fan
+    \n
+    Parameters:\n
+        - heater (MeerstetterIDs): name of the heater to be checked\n
+    Returns:\n
+        - _sid (int): submodule id\n
+        - _mid (int): module id\n
+        - _duration_us (int): elapsed time in microseconds\n
+        - message (str): raw packet\n
+        - response (float): deserialized data (Target Fan Speed (C))
+    """
+    # Convert string to address
+    meerstetter_ids_dict = MeerstetterIDs.get_ids(MeerstetterIDs)
+    meerstetter_address_dict = MeerstetterIDs.get_addresses(MeerstetterIDs)
+    id = meerstetter_ids_dict[heater]
+    address = meerstetter_address_dict[id]
+    if id not in list(meerstetter_ids_dict.values()):
+        raise HTTPException(
+            status_code=500, detail=f"Meerstetter at ID {id} not available"
+        )
+    # Build the request/response packet
+    pkt = MeerstetterBusPacket(
+        MeerstetterBusPacketType.GET_PARAMETER, 
+        address=MEERSTETTER_BUS_ADDR[id],
+        sequence= rand_request_id(),
+        parameter="Target Temperature"
+    )
+    # Send the request and get the response
+    try:
+        pkt, elapsed = await meerstetter_bus_timed_exchange(pkt)
+    except ValueError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    return {
+        "_sid": READER_SUBSYSTEM_ID,
+        "_mid": id,
+        "_duration_us": elapsed,
+        "message": pkt.raw_packet,
+        "response": str(pkt.data),
+    }
+
+@router.post("/target-fan-temperature/")
+async def set_fan_target_temperature(
+    heater: MeerstetterIDs,
+    setpoint: float):
+    """
+    Set the target fan temperature for the selected heater\n
+    \n
+    Parameters:\n
+        - heater (MeerstetterIDs): heater to be used\n
+        - setpoint (float): target fan temperature for the heater\n
+    Returns:
+        - _sid (int): submodule id\n
+        - _mid (int): module id\n
+        - _duration_us (int): elapsed time in microseconds\n
+        - message (str): raw packet\n
+        - response (float): deserialized data
+    """
+    # Convert string to address
+    meerstetter_ids_dict = MeerstetterIDs.get_ids(MeerstetterIDs)
+    meerstetter_address_dict = MeerstetterIDs.get_addresses(MeerstetterIDs)
+    id = meerstetter_ids_dict[heater]
+    address = meerstetter_address_dict[id]
+    if id not in list(meerstetter_ids_dict.values()):
+        raise HTTPException(
+            status_code=500, detail=f"Meerstetter at ID {id} not available"
+        )
+    # Build the request/response packet
+    pkt = MeerstetterBusPacket(
+        MeerstetterBusPacketType.SET_PARAMETER, 
+        address=MEERSTETTER_BUS_ADDR[id],
+        sequence= rand_request_id(),
+        parameter="Target Temperature",
+        value=setpoint
+    )
+    # Send the request and get the response
+    try:
+        pkt, elapsed = await meerstetter_bus_timed_exchange(pkt)
+    except ValueError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    return {
+        "_sid": READER_SUBSYSTEM_ID,
+        "_mid": id,
+        "_duration_us": elapsed,
+        "message": pkt.raw_packet,
+        "response": str(pkt.data),
+    }
+
 @router.get("/current-error-threshold/", response_model=dict, tags=["TEC"])
 async def get_current_error_threshold(heater: MeerstetterIDs):
     """
@@ -817,11 +907,12 @@ async def get_chx_output_stage_enabled(heater: MeerstetterIDs):
         parameter="Status"
     )
     # Send the request and get the response
+    response = "Off"
     try:
         pkt, elapsed = await meerstetter_bus_timed_exchange(pkt)
         response = "Off" if pkt.data == ChxOutputStageEnableIntOption.Off else "On"
     except ValueError as e:
-        response = options.get_option(-1)
+        #response = options.get_option(-1)
         raise HTTPException(status_code=500, detail=str(e))
     return {
         "_sid": READER_SUBSYSTEM_ID,
@@ -860,7 +951,7 @@ async def set_chx_output_stage_enabled(
             status_code=500, detail=f"Meerstetter at ID {id} not available"
         )
     # Get the int option from the str option for CHx Output Stage Enable
-    status = 1 if (status == ChxOutputStageEnableStrOption.On) else 0
+    status = 1 if (status == ChxOutputStageEnableStrOption.On.value) else 0
     # Build the request/response packet
     pkt = MeerstetterBusPacket(
         MeerstetterBusPacketType.SET_PARAMETER, 
@@ -868,6 +959,103 @@ async def set_chx_output_stage_enabled(
         sequence= rand_request_id(),
         parameter="Status",
         value=status
+    )
+    # Send the request and get the response
+    try:
+        pkt, elapsed = await meerstetter_bus_timed_exchange(pkt)
+        response = str(pkt.data)
+    except ValueError as e:
+        response = -1
+        raise HTTPException(status_code=500, detail=str(e))
+    return {
+        "_sid": READER_SUBSYSTEM_ID,
+        "_mid": id,
+        "_duration_us": elapsed,
+        "message": pkt.raw_packet,
+        "response": response,
+    }
+
+@router.post("/fan-control/")
+async def set_chx_fan_control_enable(
+    heater: MeerstetterIDs,
+    status: FanControlEnableStateStrOption):
+    """
+    Set the CHx Fan Control for the selected heater\n
+    \n
+    Parameters:\n
+        - heater (MeerstetterIDs): heater to be used\n
+        - status (FanControlEnableStateStrOption): state of the fan\n
+    Returns:
+        - _sid (int): submodule id\n
+        - _mid (int): module id\n
+        - _duration_us (int): elapsed time in microseconds\n
+        - message (str): raw packet\n
+        - response (float): deserialized data
+    """
+    # Convert string to address
+    meerstetter_ids_dict = MeerstetterIDs.get_ids(MeerstetterIDs)
+    meerstetter_address_dict = MeerstetterIDs.get_addresses(MeerstetterIDs)
+    id = meerstetter_ids_dict[heater]
+    address = meerstetter_address_dict[id]
+    if id not in list(meerstetter_ids_dict.values()):
+        raise HTTPException(
+            status_code=500, detail=f"Meerstetter at ID {id} not available"
+        )
+    # Get the int option from the str option for CHx Fan Control State
+    status = 1 if (status == FanControlEnableStateStrOption.Enabled.value) else 0
+    # Build the request/response packet
+    pkt = MeerstetterBusPacket(
+        MeerstetterBusPacketType.SET_PARAMETER, 
+        address=MEERSTETTER_BUS_ADDR[id],
+        sequence= rand_request_id(),
+        parameter="Fan Control Enable",
+        value=status
+    )
+    # Send the request and get the response
+    try:
+        pkt, elapsed = await meerstetter_bus_timed_exchange(pkt)
+        response = str(pkt.data)
+    except ValueError as e:
+        response = -1
+        raise HTTPException(status_code=500, detail=str(e))
+    return {
+        "_sid": READER_SUBSYSTEM_ID,
+        "_mid": id,
+        "_duration_us": elapsed,
+        "message": pkt.raw_packet,
+        "response": response,
+    }
+
+@router.get("/fan-control/")
+async def get_chx_fan_control_enable(
+    heater: MeerstetterIDs):
+    """
+    Set the CHx Fan Control for the selected heater\n
+    \n
+    Parameters:\n
+        - heater (MeerstetterIDs): heater to be used\n
+    Returns:
+        - _sid (int): submodule id\n
+        - _mid (int): module id\n
+        - _duration_us (int): elapsed time in microseconds\n
+        - message (str): raw packet\n
+        - response (float): deserialized data
+    """
+    # Convert string to address
+    meerstetter_ids_dict = MeerstetterIDs.get_ids(MeerstetterIDs)
+    meerstetter_address_dict = MeerstetterIDs.get_addresses(MeerstetterIDs)
+    id = meerstetter_ids_dict[heater]
+    address = meerstetter_address_dict[id]
+    if id not in list(meerstetter_ids_dict.values()):
+        raise HTTPException(
+            status_code=500, detail=f"Meerstetter at ID {id} not available"
+        )
+    # Build the request/response packet
+    pkt = MeerstetterBusPacket(
+        MeerstetterBusPacketType.GET_PARAMETER, 
+        address=MEERSTETTER_BUS_ADDR[id],
+        sequence= rand_request_id(),
+        parameter="Fan Control Enable"
     )
     # Send the request and get the response
     try:
@@ -1013,17 +1201,17 @@ async def get_device_address(heater: MeerstetterIDs):
         "response": str(pkt.data),
     }
 
-@router.post("/meerstetter/reset/{id}")
+@router.post("/meerstetter/reset/")
 async def reset(
-    id: int
+    heater: MeerstetterIDs
 ):
     """Reset the Heater Channel"""
-    if id not in [      
-        READER_OEM_HEATER_FRONT_1,
-        READER_OEM_HEATER_FRONT_2,
-        READER_OEM_HEATER_REAR_1, 
-        READER_OEM_HEATER_REAR_2  
-    ]:
+    # Convert string to address
+    meerstetter_ids_dict = MeerstetterIDs.get_ids(MeerstetterIDs)
+    meerstetter_address_dict = MeerstetterIDs.get_addresses(MeerstetterIDs)
+    id = meerstetter_ids_dict[heater]
+    address = meerstetter_address_dict[id]
+    if id not in list(meerstetter_ids_dict.values()):
         raise HTTPException(
             status_code=500, detail=f"Meerstetter at ID {id} not available"
         )
