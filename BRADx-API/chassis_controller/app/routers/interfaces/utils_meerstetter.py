@@ -167,6 +167,50 @@ ERRORS = [
     {"code": 21, "symbol": "MEPORT_ERROR_QUERY_TIMEOUT", "description": "timeout reached query cannot be served"},
 ]
 
+# TODO: Replace this with a dictionary of dictionaries to include description, error condition, and further information
+MEERSTETTER_ERRORS = {
+    -1: "Unable to communicate with the Meerstetter Device",
+    0: "No Error",
+    1: "MCU system malfunction",
+    2: "MCU system malfunction",
+    3: "MCU system malfunction",
+    4: "MCU system malfunction",
+    5: "MCU system malfunction",
+    6: "MCU system malfunction",
+    7: "MCU system malfunction",
+    8: "MCU system malfunction",
+    9: "MCU system malfunction",
+    10: "MCU system malfunction",
+    11: "Emergency stop was triggered by LTR-1200",
+    12: "LTR-1200 HMI regularly sends 'free' signals to all rack-internal devices such that they can activate their output stages (if enabled)",
+    20: "Internal parameter system malfunction",
+    21: "Internal parameter system malfunction",
+    22: "Parameter set corrupt",
+    23: "Parameter set incompatible with current firmware version",
+    24: "Firmware does not recognize valid device",
+    25: "Internal parameter system malfunction",
+    30: "Input voltage net too low",
+    31: "Input voltage net too high ",
+    32: "Internal Medium Voltage power net too low",
+    33: "Internal Medium Voltage power net too high",
+    36: "Internal 3.3V power net too low",
+    37: "Internal 3.3V power net too high",
+    60: "Device running too hot ",
+    100: "Overcurrent (positive), Driver CHx OUT+",
+    101: "Overcurrent (negative), Driver CHx OUT+",
+    102: "Overcurrent (positive), Driver CHx OUT-",
+    103: "Overcurrent (negative), Driver CHx OUT-",
+    104: "Overvoltage, Driver CHx OUT+",
+    105: "Overvoltage, Driver CHx OUT-",
+    106: "Residual current too high. The Current difference between OUT+ and OUTis too big.",
+    107: "Overall current monitoring, triggers fast switch off withint 10 microseconds ",
+    108: "Output Stage saturation error. Check input current is sufficient and Vout not set too close to Vin. Try to reduce the 'Current Limitation' in the 'Operation' tab.",
+    142: "Measured sink temperature too low",
+    143: "Measured sink temperature too high",
+    175: "The Fan does not reach the desired rotation speed.",
+    176: "The Fan does not rotate ",
+    }
+
 """
 Custom exceptions.
 """
