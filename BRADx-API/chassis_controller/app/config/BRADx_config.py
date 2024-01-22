@@ -164,13 +164,13 @@ class MeerstetterIDs(str, Enum):
         addresses = MEERSTETTER_BUS_ADDR
         return addresses
     
-class LEDChannelIDs(int, Enum):
-    one = 1
-    two = 2
-    three = 3
-    four = 4
-    five = 5
-    six = 6
+class LEDChannelIDs(str, Enum):
+    one = '1'
+    two = '2'
+    three = '3'
+    four = '4'
+    five = '5'
+    six = '6'
     
 class ChxOutputStageEnableIntOption(int, Enum):
     Off = 0
