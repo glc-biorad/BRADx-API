@@ -17,7 +17,7 @@ Firmware versioning, etc. This REST API is utilized by both the CDP 2.0 GUI as w
 ### Installation
 1. Clone the repo
 2. Open the command prompt in the project directory (BRADx-API/BRADx-API) and run python -m pip install -r requirements.txt
-3. Open the solution in Visual Studio and build the project
+3. In BRADx-API/BRADx-API run python server_start.py
 
 ## Usage
 
