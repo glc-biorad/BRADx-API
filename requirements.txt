@@ -1,0 +1,11 @@
+numpy
+pandas
+Pillow
+pyserial
+matplotlib
+clr
+pythonnet
+fastapi
+uvicorn
+tifffile
+aioserial
