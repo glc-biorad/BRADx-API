@@ -1073,6 +1073,282 @@ async def get_chx_fan_control_enable(
         "response": response,
     }
 
+@router.get("/Kp/", response_model=dict, tags=["TEC"])
+async def get_pid_Kp(heater: MeerstetterIDs):
+    """
+    Returns the current proportional PID value for the selected heater
+    \n
+    Parameters:\n
+        - heater (MeerstetterIDs): name of the heater to be checked\n
+    Returns:\n
+        - _sid (int): submodule id\n
+        - _mid (int): module id\n
+        - _duration_us (int): elapsed time in microseconds\n
+        - message (str): raw packet\n
+        - response (float): deserialized data (Object Temperature)
+    """
+    # Convert string to address
+    meerstetter_ids_dict = MeerstetterIDs.get_ids(MeerstetterIDs)
+    meerstetter_address_dict = MeerstetterIDs.get_addresses(MeerstetterIDs)
+    id = meerstetter_ids_dict[heater]
+    address = meerstetter_address_dict[id]
+    if id not in list(meerstetter_ids_dict.values()):
+        raise HTTPException(
+            status_code=500, detail=f"Meerstetter at ID {id} not available"
+        )
+    # Build the request/response packet
+    pkt = MeerstetterBusPacket(
+        MeerstetterBusPacketType.GET_PARAMETER, 
+        address=MEERSTETTER_BUS_ADDR[id],
+        sequence= rand_request_id(),
+        parameter="Kp"
+    )
+    # Send the request and get the response
+    try:
+        pkt, elapsed = await meerstetter_bus_timed_exchange(pkt)
+        response = str(pkt.data)
+    except ValueError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+        response = "None"
+    return {
+        "_sid": READER_SUBSYSTEM_ID,
+        "_mid": id,
+        "_duration_us": elapsed,
+        "message": pkt.raw_packet,
+        "response": response,
+    }
+
+@router.post("/Kp/")
+async def set_pid_Kp(
+    heater: MeerstetterIDs,
+    setpoint: float):
+    """
+    Set the PID proportional term for the selected heater\n
+    \n
+    Parameters:\n
+        - heater (MeerstetterIDs): heater to be used\n
+        - setpoint (float): Proportional term for the PID\n
+    Returns:
+        - _sid (int): submodule id\n
+        - _mid (int): module id\n
+        - _duration_us (int): elapsed time in microseconds\n
+        - message (str): raw packet\n
+        - response (float): deserialized data
+    """
+    # Convert string to address
+    meerstetter_ids_dict = MeerstetterIDs.get_ids(MeerstetterIDs)
+    meerstetter_address_dict = MeerstetterIDs.get_addresses(MeerstetterIDs)
+    id = meerstetter_ids_dict[heater]
+    address = meerstetter_address_dict[id]
+    if id not in list(meerstetter_ids_dict.values()):
+        raise HTTPException(
+            status_code=500, detail=f"Meerstetter at ID {id} not available"
+        )
+    # Build the request/response packet
+    pkt = MeerstetterBusPacket(
+        MeerstetterBusPacketType.SET_PARAMETER, 
+        address=MEERSTETTER_BUS_ADDR[id],
+        sequence= rand_request_id(),
+        parameter="Kp",
+        value=setpoint
+    )
+    # Send the request and get the response
+    try:
+        pkt, elapsed = await meerstetter_bus_timed_exchange(pkt)
+    except ValueError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    return {
+        "_sid": READER_SUBSYSTEM_ID,
+        "_mid": id,
+        "_duration_us": elapsed,
+        "message": pkt.raw_packet,
+        "response": str(pkt.data),
+    }
+
+@router.get("/Ti/", response_model=dict, tags=["TEC"])
+async def get_pid_Ti(heater: MeerstetterIDs):
+    """
+    Returns the current integral PID value for the selected heater
+    \n
+    Parameters:\n
+        - heater (MeerstetterIDs): name of the heater to be checked\n
+    Returns:\n
+        - _sid (int): submodule id\n
+        - _mid (int): module id\n
+        - _duration_us (int): elapsed time in microseconds\n
+        - message (str): raw packet\n
+        - response (float): deserialized data (Object Temperature)
+    """
+    # Convert string to address
+    meerstetter_ids_dict = MeerstetterIDs.get_ids(MeerstetterIDs)
+    meerstetter_address_dict = MeerstetterIDs.get_addresses(MeerstetterIDs)
+    id = meerstetter_ids_dict[heater]
+    address = meerstetter_address_dict[id]
+    if id not in list(meerstetter_ids_dict.values()):
+        raise HTTPException(
+            status_code=500, detail=f"Meerstetter at ID {id} not available"
+        )
+    # Build the request/response packet
+    pkt = MeerstetterBusPacket(
+        MeerstetterBusPacketType.GET_PARAMETER, 
+        address=MEERSTETTER_BUS_ADDR[id],
+        sequence= rand_request_id(),
+        parameter="Ti"
+    )
+    # Send the request and get the response
+    try:
+        pkt, elapsed = await meerstetter_bus_timed_exchange(pkt)
+        response = str(pkt.data)
+    except ValueError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+        response = "None"
+    return {
+        "_sid": READER_SUBSYSTEM_ID,
+        "_mid": id,
+        "_duration_us": elapsed,
+        "message": pkt.raw_packet,
+        "response": response,
+    }
+
+@router.post("/Ti/")
+async def set_pid_Ti(
+    heater: MeerstetterIDs,
+    setpoint: float):
+    """
+    Set the PID integral term for the selected heater\n
+    \n
+    Parameters:\n
+        - heater (MeerstetterIDs): heater to be used\n
+        - setpoint (float): Integral term for the PID\n
+    Returns:
+        - _sid (int): submodule id\n
+        - _mid (int): module id\n
+        - _duration_us (int): elapsed time in microseconds\n
+        - message (str): raw packet\n
+        - response (float): deserialized data
+    """
+    # Convert string to address
+    meerstetter_ids_dict = MeerstetterIDs.get_ids(MeerstetterIDs)
+    meerstetter_address_dict = MeerstetterIDs.get_addresses(MeerstetterIDs)
+    id = meerstetter_ids_dict[heater]
+    address = meerstetter_address_dict[id]
+    if id not in list(meerstetter_ids_dict.values()):
+        raise HTTPException(
+            status_code=500, detail=f"Meerstetter at ID {id} not available"
+        )
+    # Build the request/response packet
+    pkt = MeerstetterBusPacket(
+        MeerstetterBusPacketType.SET_PARAMETER, 
+        address=MEERSTETTER_BUS_ADDR[id],
+        sequence= rand_request_id(),
+        parameter="Ti",
+        value=setpoint
+    )
+    # Send the request and get the response
+    try:
+        pkt, elapsed = await meerstetter_bus_timed_exchange(pkt)
+    except ValueError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    return {
+        "_sid": READER_SUBSYSTEM_ID,
+        "_mid": id,
+        "_duration_us": elapsed,
+        "message": pkt.raw_packet,
+        "response": str(pkt.data),
+    }
+
+@router.get("/Td/", response_model=dict, tags=["TEC"])
+async def get_pid_Td(heater: MeerstetterIDs):
+    """
+    Returns the current derivative PID value for the selected heater
+    \n
+    Parameters:\n
+        - heater (MeerstetterIDs): name of the heater to be checked\n
+    Returns:\n
+        - _sid (int): submodule id\n
+        - _mid (int): module id\n
+        - _duration_us (int): elapsed time in microseconds\n
+        - message (str): raw packet\n
+        - response (float): deserialized data (Object Temperature)
+    """
+    # Convert string to address
+    meerstetter_ids_dict = MeerstetterIDs.get_ids(MeerstetterIDs)
+    meerstetter_address_dict = MeerstetterIDs.get_addresses(MeerstetterIDs)
+    id = meerstetter_ids_dict[heater]
+    address = meerstetter_address_dict[id]
+    if id not in list(meerstetter_ids_dict.values()):
+        raise HTTPException(
+            status_code=500, detail=f"Meerstetter at ID {id} not available"
+        )
+    # Build the request/response packet
+    pkt = MeerstetterBusPacket(
+        MeerstetterBusPacketType.GET_PARAMETER, 
+        address=MEERSTETTER_BUS_ADDR[id],
+        sequence= rand_request_id(),
+        parameter="Td"
+    )
+    # Send the request and get the response
+    try:
+        pkt, elapsed = await meerstetter_bus_timed_exchange(pkt)
+        response = str(pkt.data)
+    except ValueError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+        response = "None"
+    return {
+        "_sid": READER_SUBSYSTEM_ID,
+        "_mid": id,
+        "_duration_us": elapsed,
+        "message": pkt.raw_packet,
+        "response": response,
+    }
+
+@router.post("/Td/")
+async def set_pid_Td(
+    heater: MeerstetterIDs,
+    setpoint: float):
+    """
+    Set the PID derivative term for the selected heater\n
+    \n
+    Parameters:\n
+        - heater (MeerstetterIDs): heater to be used\n
+        - setpoint (float): Proportional term for the PID\n
+    Returns:
+        - _sid (int): submodule id\n
+        - _mid (int): module id\n
+        - _duration_us (int): elapsed time in microseconds\n
+        - message (str): raw packet\n
+        - response (float): deserialized data
+    """
+    # Convert string to address
+    meerstetter_ids_dict = MeerstetterIDs.get_ids(MeerstetterIDs)
+    meerstetter_address_dict = MeerstetterIDs.get_addresses(MeerstetterIDs)
+    id = meerstetter_ids_dict[heater]
+    address = meerstetter_address_dict[id]
+    if id not in list(meerstetter_ids_dict.values()):
+        raise HTTPException(
+            status_code=500, detail=f"Meerstetter at ID {id} not available"
+        )
+    # Build the request/response packet
+    pkt = MeerstetterBusPacket(
+        MeerstetterBusPacketType.SET_PARAMETER, 
+        address=MEERSTETTER_BUS_ADDR[id],
+        sequence= rand_request_id(),
+        parameter="Td",
+        value=setpoint
+    )
+    # Send the request and get the response
+    try:
+        pkt, elapsed = await meerstetter_bus_timed_exchange(pkt)
+    except ValueError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    return {
+        "_sid": READER_SUBSYSTEM_ID,
+        "_mid": id,
+        "_duration_us": elapsed,
+        "message": pkt.raw_packet,
+        "response": str(pkt.data),
+    }
+
 @router.get("/firmware-version/", response_model=dict, tags=["TEC"])
 async def get_firmware_version(heater: MeerstetterIDs):
     """
