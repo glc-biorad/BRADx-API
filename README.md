@@ -8,6 +8,8 @@ Firmware versioning, etc. This REST API is utilized by both the CDP 2.0 GUI as w
 - python
 - fastapi
 - uvicorn
+- pyserial
+- aioserial
 
 ## Getting Started
 ### Prerequists
