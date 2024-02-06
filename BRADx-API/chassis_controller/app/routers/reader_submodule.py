@@ -3,6 +3,7 @@
 from fastapi import APIRouter, HTTPException, Query
 from chassis_controller.app.routers.interfaces.utils import convert_distance_str_to_steps
 from chassis_controller.app.config.BRADx_config import *
+from chassis_controller.app.routers.interfaces.MotorResponse import MotorResponse
 
 from .interfaces.utils import (
     BRADXRequest,
@@ -31,7 +32,7 @@ router = APIRouter(
 READER_SUBSYSTEM_ID = 0x03
 
 
-@router.get("/axis/version/{id}")
+@router.get("/axis/version/{id}", response_model=MotorResponse)
 async def get_version(id: int):
     """Returns the version info of the given axis"""
     if id not in [
@@ -59,17 +60,17 @@ async def get_version(id: int):
     try:
         pkt, elapsed = await bradx_bus_timed_exchange(req)
         version = pkt.data
+        print(version)
     except ValueError as e:
         raise HTTPException(status_code=500, detail=str(e))
-    return {
-        "_sid": READER_SUBSYSTEM_ID,
-        "_mid": id,
-        "_duration_us": elapsed,
-        "message": message.raw.strip(),
-        "response": "v"+version[8]+"."+version[9]+"."+version[10]
-    }
+    return MotorResponse(submodule_id=READER_SUBSYSTEM_ID,
+                         module_id=id,
+                         duration_us=elapsed,
+                         message=message.raw.strip(),
+                         response=pkt.data,
+                         value=MotorResponse.parse(message.raw.strip(), pkt.data))
 
-@router.get("/axis/position/{id}")
+@router.get("/axis/position/{id}", response_model=MotorResponse)
 async def get_status_and_position(id: int):
     """Returns the status and most recent position value of the addressed motor"""
     if id not in [
@@ -97,16 +98,15 @@ async def get_status_and_position(id: int):
         pkt, elapsed = await bradx_bus_timed_exchange(req)
     except ValueError as e:
         raise HTTPException(status_code=500, detail=str(e))
-    return {
-        "_sid": READER_SUBSYSTEM_ID,
-        "_mid": id,
-        "_duration_us": elapsed,
-        "message": message.raw.strip(),
-        "response": pkt.data,
-    }
+    return MotorResponse(submodule_id=READER_SUBSYSTEM_ID,
+                         module_id=id,
+                         duration_us=elapsed,
+                         message=message.raw.strip(),
+                         response=pkt.data,
+                         value=MotorResponse.parse(message.raw.strip(), pkt.data))
 
 
-@router.post("/axis/move/{id}")
+@router.post("/axis/move/{id}", response_model=MotorResponse)
 async def set_axis_position(
     id: int ,
     position: int = Query(description="Axis absolute position"),
@@ -138,16 +138,15 @@ async def set_axis_position(
         pkt, elapsed = await bradx_bus_timed_exchange(req)
     except ValueError as e:
         raise HTTPException(status_code=500, detail=str(e))
-    return {
-        "_sid": READER_SUBSYSTEM_ID,
-        "_mid": id,
-        "_duration_us": elapsed,
-        "message": message.raw.strip(),
-        "response": pkt.data,
-    }
+    return MotorResponse(submodule_id=READER_SUBSYSTEM_ID,
+                         module_id=id,
+                         duration_us=elapsed,
+                         message=message.raw.strip(),
+                         response=pkt.data,
+                         value=MotorResponse.parse(message.raw.strip(), pkt.data))
 
 
-@router.post("/axis/home/{id}")
+@router.post("/axis/home/{id}", response_model=MotorResponse)
 async def home_axis(id: int):
     """Home the axis"""
     if id not in [
@@ -175,13 +174,12 @@ async def home_axis(id: int):
         pkt, elapsed = await bradx_bus_timed_exchange(req)
     except ValueError as e:
         raise HTTPException(status_code=500, detail=str(e))
-    return {
-        "_sid": READER_SUBSYSTEM_ID,
-        "_mid": id,
-        "_duration_us": elapsed,
-        "message": message.raw.strip(),
-        "response": pkt.data,
-    }
+    return MotorResponse(submodule_id=READER_SUBSYSTEM_ID,
+                         module_id=id,
+                         duration_us=elapsed,
+                         message=message.raw.strip(),
+                         response=pkt.data,
+                         value=MotorResponse.parse(message.raw.strip(), pkt.data))
 
 @router.post("/axis/jog/{id}")
 async def jog_axis(

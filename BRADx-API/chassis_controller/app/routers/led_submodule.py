@@ -3,6 +3,7 @@
 from fastapi import APIRouter, HTTPException, Query
 from chassis_controller.app.routers.interfaces.utils import convert_distance_str_to_steps
 from chassis_controller.app.config.BRADx_config import *
+from chassis_controller.app.routers.interfaces.LEDResponse import LEDResponse
 
 from .interfaces.utils import (
     BRADXRequest,
@@ -49,7 +50,7 @@ async def get_version():
         "response": "v"+version[8]+"."+version[9]+"."+version[10]
     }
 
-@router.get("/status/", response_model=dict, tags=["LED"])
+@router.get("/status/", response_model=LEDResponse, tags=["LED"])
 async def get_status(channel: LEDChannelIDs = Query(description="LED Channel ID")):
     """
     Returns the status of the LED
@@ -65,17 +66,17 @@ async def get_status(channel: LEDChannelIDs = Query(description="LED Channel ID"
     try:
         pkt, elapsed = await bradx_bus_timed_exchange(req)
         response = int(str(pkt.data).strip("\r").split(",")[-1])/10
+        print(pkt.data)
     except ValueError as e:
         raise HTTPException(status_code=500, detail=str(e))
-    return {
-        "_sid": READER_SUBSYSTEM_ID,
-        "_mid": id,
-        "_duration_us": elapsed,
-        "message": message.raw.strip(),
-        "response": str(response)
-    }
+    return LEDResponse(submodule_id=READER_SUBSYSTEM_ID,
+                       module_id=id,
+                       duration_us=elapsed,
+                       message=message.raw.strip(), 
+                       response=pkt.data,
+                       value=LEDResponse.parse(pkt.data))
 
-@router.post("/on/", response_model=dict, tags=["LED"])
+@router.post("/on/", response_model=LEDResponse, tags=["LED"])
 async def led_channel_on(channel: LEDChannelIDs = Query(description="LED Channel ID"),
     intensity: int = Query(description="LED Intensity (%)")
     ):
@@ -106,15 +107,14 @@ async def led_channel_on(channel: LEDChannelIDs = Query(description="LED Channel
         response = 0
     except ValueError as e:
         raise HTTPException(status_code=500, detail=str(e))
-    return {
-        "_sid": READER_SUBSYSTEM_ID,
-        "_mid": id,
-        "_duration_us": elapsed,
-        "message": message.raw.strip(),
-        "response": pkt.data, # response
-    }
+    return LEDResponse(submodule_id=READER_SUBSYSTEM_ID,
+                       module_id=id,
+                       duration_us=elapsed,
+                       message=message.raw.strip(), 
+                       response=pkt.data,
+                       value=LEDResponse.parse(pkt.data))
 
-@router.post("/off/", response_model=dict, tags=["LED"])
+@router.post("/off/", response_model=LEDResponse, tags=["LED"])
 async def led_channel_off(channel: LEDChannelIDs = Query(description="LED Channel ID")):
     """Turn off the LED Channel
     \n
@@ -139,12 +139,11 @@ async def led_channel_off(channel: LEDChannelIDs = Query(description="LED Channe
     except ValueError as e:
         response = -1
         raise HTTPException(status_code=500, detail=str(e))
-    return {
-        "_sid": READER_SUBSYSTEM_ID,
-        "_mid": id,
-        "_duration_us": elapsed,
-        "message": message.raw.strip(),
-        "response": str(response)
-    }
+    return LEDResponse(submodule_id=READER_SUBSYSTEM_ID,
+                       module_id=id,
+                       duration_us=elapsed,
+                       message=message.raw.strip(), 
+                       response=pkt.data,
+                       value=LEDResponse.parse(pkt.data))
 
 

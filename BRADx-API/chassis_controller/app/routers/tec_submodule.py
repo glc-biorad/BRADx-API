@@ -5,6 +5,7 @@ from urllib import response
 from fastapi import APIRouter, HTTPException, Query
 from chassis_controller.app.routers.interfaces.utils import convert_distance_str_to_steps
 from chassis_controller.app.config.BRADx_config import *
+from chassis_controller.app.routers.interfaces.MeerstetterResponse import MeerstetterResponse
 
 from .interfaces.utils import (
     BRADXRequest,
@@ -36,7 +37,7 @@ READER_SUBSYSTEM_ID = 0x03
 
 # NOTE: TEC_PARAMETERS that are taken from the TEC commands doc are located in /routers/interface/utils_meerstetter.py
 
-@router.get("/object-temperature/", response_model=dict, tags=["TEC"])
+@router.get("/object-temperature/", response_model=MeerstetterResponse, tags=["TEC"])
 async def get_object_temperature(heater: MeerstetterIDs):
     """
     Returns the current temp of the object in degrees Celsius
@@ -73,13 +74,12 @@ async def get_object_temperature(heater: MeerstetterIDs):
     except ValueError as e:
         raise HTTPException(status_code=500, detail=str(e))
         response = "None"
-    return {
-        "_sid": READER_SUBSYSTEM_ID,
-        "_mid": id,
-        "_duration_us": elapsed,
-        "message": pkt.raw_packet,
-        "response": response,
-    }
+    return MeerstetterResponse(submodule_id=READER_SUBSYSTEM_ID,
+                               module_id=id,
+                               duration_us=elapsed,
+                               message=str(pkt.raw_packet),
+                               response=str(pkt.data),
+                               value=MeerstetterResponse.parse(str(pkt.raw_packet), str(pkt.data)))
 
 @router.post("/object-temperature/")
 async def set_object_temperature(
@@ -1334,6 +1334,190 @@ async def set_pid_Td(
         address=MEERSTETTER_BUS_ADDR[id],
         sequence= rand_request_id(),
         parameter="Td",
+        value=setpoint
+    )
+    # Send the request and get the response
+    try:
+        pkt, elapsed = await meerstetter_bus_timed_exchange(pkt)
+    except ValueError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    return {
+        "_sid": READER_SUBSYSTEM_ID,
+        "_mid": id,
+        "_duration_us": elapsed,
+        "message": pkt.raw_packet,
+        "response": str(pkt.data),
+    }
+
+@router.get("/current-limitation/", response_model=dict, tags=["TEC"])
+async def get_current_limitation(heater: MeerstetterIDs):
+    """
+    Returns the current current limitation value for the selected heater
+    \n
+    Parameters:\n
+        - heater (MeerstetterIDs): name of the heater to be checked\n
+    Returns:\n
+        - _sid (int): submodule id\n
+        - _mid (int): module id\n
+        - _duration_us (int): elapsed time in microseconds\n
+        - message (str): raw packet\n
+        - response (float): deserialized data (Object Temperature)
+    """
+    # Convert string to address
+    meerstetter_ids_dict = MeerstetterIDs.get_ids(MeerstetterIDs)
+    meerstetter_address_dict = MeerstetterIDs.get_addresses(MeerstetterIDs)
+    id = meerstetter_ids_dict[heater]
+    address = meerstetter_address_dict[id]
+    if id not in list(meerstetter_ids_dict.values()):
+        raise HTTPException(
+            status_code=500, detail=f"Meerstetter at ID {id} not available"
+        )
+    # Build the request/response packet
+    pkt = MeerstetterBusPacket(
+        MeerstetterBusPacketType.GET_PARAMETER, 
+        address=MEERSTETTER_BUS_ADDR[id],
+        sequence= rand_request_id(),
+        parameter="Current Limitation"
+    )
+    # Send the request and get the response
+    try:
+        pkt, elapsed = await meerstetter_bus_timed_exchange(pkt)
+        response = str(pkt.data)
+    except ValueError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+        response = "None"
+    return {
+        "_sid": READER_SUBSYSTEM_ID,
+        "_mid": id,
+        "_duration_us": elapsed,
+        "message": pkt.raw_packet,
+        "response": response,
+    }
+
+@router.post("/current-limitation/")
+async def set_current_limitation(
+    heater: MeerstetterIDs,
+    setpoint: float):
+    """
+    Set the current limitation for the selected heater\n
+    \n
+    Parameters:\n
+        - heater (MeerstetterIDs): heater to be used\n
+        - setpoint (float): Proportional term for the PID\n
+    Returns:
+        - _sid (int): submodule id\n
+        - _mid (int): module id\n
+        - _duration_us (int): elapsed time in microseconds\n
+        - message (str): raw packet\n
+        - response (float): deserialized data
+    """
+    # Convert string to address
+    meerstetter_ids_dict = MeerstetterIDs.get_ids(MeerstetterIDs)
+    meerstetter_address_dict = MeerstetterIDs.get_addresses(MeerstetterIDs)
+    id = meerstetter_ids_dict[heater]
+    address = meerstetter_address_dict[id]
+    if id not in list(meerstetter_ids_dict.values()):
+        raise HTTPException(
+            status_code=500, detail=f"Meerstetter at ID {id} not available"
+        )
+    # Build the request/response packet
+    pkt = MeerstetterBusPacket(
+        MeerstetterBusPacketType.SET_PARAMETER, 
+        address=MEERSTETTER_BUS_ADDR[id],
+        sequence= rand_request_id(),
+        parameter="Current Limitation",
+        value=setpoint
+    )
+    # Send the request and get the response
+    try:
+        pkt, elapsed = await meerstetter_bus_timed_exchange(pkt)
+    except ValueError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    return {
+        "_sid": READER_SUBSYSTEM_ID,
+        "_mid": id,
+        "_duration_us": elapsed,
+        "message": pkt.raw_packet,
+        "response": str(pkt.data),
+    }
+
+@router.get("/voltage-limitation/", response_model=dict, tags=["TEC"])
+async def get_voltage_limitation(heater: MeerstetterIDs):
+    """
+    Returns the current voltage limitation value for the selected heater
+    \n
+    Parameters:\n
+        - heater (MeerstetterIDs): name of the heater to be checked\n
+    Returns:\n
+        - _sid (int): submodule id\n
+        - _mid (int): module id\n
+        - _duration_us (int): elapsed time in microseconds\n
+        - message (str): raw packet\n
+        - response (float): deserialized data (Object Temperature)
+    """
+    # Convert string to address
+    meerstetter_ids_dict = MeerstetterIDs.get_ids(MeerstetterIDs)
+    meerstetter_address_dict = MeerstetterIDs.get_addresses(MeerstetterIDs)
+    id = meerstetter_ids_dict[heater]
+    address = meerstetter_address_dict[id]
+    if id not in list(meerstetter_ids_dict.values()):
+        raise HTTPException(
+            status_code=500, detail=f"Meerstetter at ID {id} not available"
+        )
+    # Build the request/response packet
+    pkt = MeerstetterBusPacket(
+        MeerstetterBusPacketType.GET_PARAMETER, 
+        address=MEERSTETTER_BUS_ADDR[id],
+        sequence= rand_request_id(),
+        parameter="Voltage Limitation"
+    )
+    # Send the request and get the response
+    try:
+        pkt, elapsed = await meerstetter_bus_timed_exchange(pkt)
+        response = str(pkt.data)
+    except ValueError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+        response = "None"
+    return {
+        "_sid": READER_SUBSYSTEM_ID,
+        "_mid": id,
+        "_duration_us": elapsed,
+        "message": pkt.raw_packet,
+        "response": response,
+    }
+
+@router.post("/voltage-limitation/")
+async def set_voltage_limitation(
+    heater: MeerstetterIDs,
+    setpoint: float):
+    """
+    Set the voltage limitation for the selected heater\n
+    \n
+    Parameters:\n
+        - heater (MeerstetterIDs): heater to be used\n
+        - setpoint (float): Proportional term for the PID\n
+    Returns:
+        - _sid (int): submodule id\n
+        - _mid (int): module id\n
+        - _duration_us (int): elapsed time in microseconds\n
+        - message (str): raw packet\n
+        - response (float): deserialized data
+    """
+    # Convert string to address
+    meerstetter_ids_dict = MeerstetterIDs.get_ids(MeerstetterIDs)
+    meerstetter_address_dict = MeerstetterIDs.get_addresses(MeerstetterIDs)
+    id = meerstetter_ids_dict[heater]
+    address = meerstetter_address_dict[id]
+    if id not in list(meerstetter_ids_dict.values()):
+        raise HTTPException(
+            status_code=500, detail=f"Meerstetter at ID {id} not available"
+        )
+    # Build the request/response packet
+    pkt = MeerstetterBusPacket(
+        MeerstetterBusPacketType.SET_PARAMETER, 
+        address=MEERSTETTER_BUS_ADDR[id],
+        sequence= rand_request_id(),
+        parameter="Voltage Limitation",
         value=setpoint
     )
     # Send the request and get the response

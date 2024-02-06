@@ -1,7 +1,9 @@
 
 # Version: Test
 from fastapi import APIRouter, Query, HTTPException
+from typing import Union
 from chassis_controller.app.config.BRADx_config import *
+from chassis_controller.app.routers.interfaces.ChassisResponse import ChassisResponse
 
 from chassis_controller.app.routers.interfaces.utils import (
     REQUEST_START_FLAG,
@@ -58,7 +60,7 @@ async def get_remoteProg():
         "response": pkt.data
     }
 
-@router.get("/chassis/version")
+@router.get("/chassis/version", response_model=ChassisResponse)
 async def get_chassis_version():
     """Returns the version info of the chassis bus controller FW"""
     # Build the request message and packet
@@ -73,13 +75,12 @@ async def get_chassis_version():
         
     except ValueError as e:
         raise HTTPException(status_code=500, detail=str(e))
-    return {
-        "_sid": CHASSIS_SUBSYSTEM_ID,
-        "_mid": CHASSIS_VER,
-        "_duration_us": elapsed,
-        "message": message.raw,
-        "version": "v"+version[0]+"."+version[1]+"."+version[2]        
-    }
+    return ChassisResponse(submodule_id=CHASSIS_SUBSYSTEM_ID, 
+                           module_id=CHASSIS_VER, 
+                           duration_us=elapsed, 
+                           message=message.raw, 
+                           response=pkt.data,
+                           value=ChassisResponse.parse(pkt.data))
     
 @router.get("/raw")
 async def exchange_raw_request_response(
@@ -140,7 +141,7 @@ async def get_power_supply_status(id: int):
     }
 
 
-@router.post("/relay/{chan}")
+@router.post("/relay/{chan}", response_model=ChassisResponse)
 async def set_power_relay_state(
     chan: int,
     state: bool = Query(description="Relay state (on/off)")
@@ -198,13 +199,12 @@ async def set_power_relay_state(
         pkt, elapsed = await bradx_bus_timed_exchange(req)
     except ValueError as e:
         raise HTTPException(status_code=500, detail=str(e))
-    return {
-        "_sid": CHASSIS_SUBSYSTEM_ID,
-        "_mid": POWER_RELAYS,
-        "_duration_us": elapsed,
-        "message": "",
-        "response": pkt.data,
-    }
+    return ChassisResponse(submodule_id=CHASSIS_SUBSYSTEM_ID,
+                           module_id=POWER_RELAYS,
+                           duration_us=elapsed,
+                           message=str(req.raw_packet),
+                           response=pkt.data,
+                           value=ChassisResponse.parse(pkt.data))
 
 @router.post("/GPIO Port E/{chan}")
 async def set_gpio_state(
