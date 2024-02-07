@@ -14,8 +14,8 @@ from chassis_controller.app.routers.interfaces.BRADxBus import bradx_bus_timed_e
 
 
 router = APIRouter(
-    prefix="/prep_deck",
-    tags=["prep_deck"],
+    prefix="/prep-deck",
+    tags=["prep-deck"],
     dependencies=[],
     responses={404: {"description": "Not found"}},
 )
